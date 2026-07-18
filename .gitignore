@@ -1,0 +1,25 @@
+# IntelliJ
+.idea/
+*.iml
+out/
+
+# Spring Boot / Maven
+target/
+*.log
+
+# React / Node
+node_modules/
+dist/
+.env
+.env.local
+
+# VS Code
+.vscode/
+
+# Operating system
+.DS_Store
+Thumbs.db
+
+# H2 local database files
+*.mv.db
+*.trace.db
