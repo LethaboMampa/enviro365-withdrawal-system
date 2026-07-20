@@ -1,0 +1,306 @@
+# Portfolio API Documentation
+
+## Overview
+
+The Portfolio API manages investor portfolios in the Enviro365 Withdrawal System.
+
+It supports:
+
+* Creating a portfolio
+* Retrieving a portfolio by ID
+* Retrieving all portfolios belonging to an investor
+* Deleting a portfolio
+
+## Base URL
+http://localhost:8080/api/portfolios
+
+## Content Type
+
+Requests containing a body must use:
+Content-Type: application/json
+
+# 1. Create Portfolio
+Creates a new portfolio for an investor.
+
+## Endpoint
+POST /api/portfolios
+
+## Request Body
+The request body must match `PortfolioRequestDTO`.
+
+Example:
+{
+  "investorId": 1,
+  "portfolioName": "Retirement Growth Portfolio",
+  "portfolioType": "RETIREMENT",
+  "balance": 250000.00
+}
+
+## Request Fields
+
+| Field           | Type   | Required | Description                               |
+| --------------- | ------ | -------- | ----------------------------------------- |
+| `investorId`    | Long   | Yes      | ID of the investor who owns the portfolio |
+| `portfolioName` | String | Yes      | Name of the portfolio                     |
+| `portfolioType` | String | Yes      | Type of portfolio                         |
+| `balance`       | Number | Yes      | Current portfolio balance                 |
+
+## Supported Portfolio Types
+
+Based on the `PortfolioType` enum:
+
+RETIREMENT
+SAVINGS
+INVESTMENT
+
+## Example Request
+POST http://localhost:8080/api/portfolios
+Content-Type: application/json
+
+{
+  "investorId": 1,
+  "portfolioName": "Retirement Growth Portfolio",
+  "portfolioType": "RETIREMENT",
+  "balance": 250000.00
+}
+
+## Success Response
+
+### Status
+201 Created
+
+### Example Response
+
+```json
+{
+  "id": 16,
+  "portfolioName": "Retirement Growth Portfolio",
+  "portfolioType": "RETIREMENT",
+  "balance": 250000.0,
+  "createdAt": "2026-07-19T15:45:00",
+  "products": [],
+  "withdrawals": []
+}
+```
+
+## Validation Error
+
+Returned when the request contains missing or invalid fields.
+
+## Investor Not Found
+
+Returned when the supplied `investorId` does not exist.
+
+### Status
+404 Not Found
+
+### Example Response
+{
+    "path": "/api/portfolios",
+    "error": "Resource Not Found",
+    "message": "Investor not found",
+    "timestamp": "2026-07-19T12:41:01.3926592",
+    "status": 404
+}
+```
+
+## Possible Errors
+
+* Investor does not exist
+* Portfolio name is missing
+* Invalid portfolio type
+* Negative or invalid balance
+* Required request fields are missing
+
+# 2. Get Portfolio by ID
+
+Retrieves a single portfolio using its ID.
+
+## Endpoint
+GET /api/portfolios/{id}
+
+## Path Parameter
+
+| Parameter | Type | Required | Description         |
+| --------- | ---- | -------- | ------------------- |
+| `id`      | Long | Yes      | Unique portfolio ID |
+
+## Example Request
+GET http://localhost:8080/api/portfolios/1
+
+## Success Response
+
+### Status
+
+```http
+200 OK
+```
+
+### Example Response
+
+```json
+{
+  "id": 1,
+  "portfolioName": "Primary Retirement Portfolio",
+  "portfolioType": "RETIREMENT",
+  "balance": 185000.0,
+  "createdAt": "2026-06-01T09:00:00",
+  "investor": {
+    "id": 1,
+    "fullName": "Thabo Nkosi",
+    "email": "thabo.nkosi@example.com"
+  },
+  "products": [
+    {
+      "id": 1,
+      "productName": "Retirement Annuity Fund",
+      "productType": "RETIREMENT",
+      "units": 100.0,
+      "unitPrice": 1500.0
+    },
+    {
+      "id": 2,
+      "productName": "Government Bond Fund",
+      "productType": "BOND",
+      "units": 50.0,
+      "unitPrice": 700.0
+    }
+  ]
+}
+```
+
+## Portfolio Not Found
+
+### Status
+404 Not Found
+
+### Example Response
+{
+    "path": "/api/portfolios/1",
+    "error": "Resource Not Found",
+    "message": "Portfolio not found",
+    "timestamp": "2026-07-19T12:43:04.8415424",
+    "status": 404
+}
+
+---
+
+# 3. Get Portfolios by Investor
+
+Retrieves all portfolios that belong to a specific investor.
+
+## Endpoint
+GET /api/portfolios/investor/{investorId}
+
+## Path Parameter
+
+| Parameter    | Type | Required | Description               |
+| ------------ | ---- | -------- | ------------------------- |
+| `investorId` | Long | Yes      | ID of the portfolio owner |
+
+## Example Request
+GET http://localhost:8080/api/portfolios/investor/1
+
+## Success Response
+
+### Status
+200 OK
+
+### Example Response
+  {
+    "id": 1,
+    "portfolioName": "Primary Retirement Portfolio",
+    "portfolioType": "RETIREMENT",
+    "balance": 185000.0,
+    "createdAt": "2026-06-01T09:00:00",
+    "products": [
+      {
+        "id": 1,
+        "productName": "Retirement Annuity Fund",
+        "productType": "RETIREMENT",
+        "units": 100.0,
+        "unitPrice": 1500.0
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "portfolioName": "Emergency Savings Portfolio",
+    "portfolioType": "SAVINGS",
+    "balance": 42000.0,
+    "createdAt": "2026-06-01T09:15:00",
+    "products": [
+      {
+        "id": 3,
+        "productName": "Money Market Fund",
+        "productType": "CASH",
+        "units": 420.0,
+        "unitPrice": 100.0
+      }
+    ]
+  }
+
+## Empty Response
+
+When the investor exists but does not have any portfolios:
+[]
+
+# 4. Delete Portfolio
+
+Deletes a portfolio using its ID.
+
+## Endpoint
+DELETE /api/portfolios/{id}
+
+## Path Parameter
+
+| Parameter | Type | Required | Description                   |
+| --------- | ---- | -------- | ----------------------------- |
+| `id`      | Long | Yes      | ID of the portfolio to delete |
+
+## Example Request
+DELETE http://localhost:8080/api/portfolios/15
+
+## Success Response
+
+### Status
+204 No Content
+
+The response does not contain a body.
+
+## Portfolio Not Found
+
+### Status
+404 Not Found
+
+### Example Response
+{
+    "path": "/api/portfolios/1",
+    "error": "Resource Not Found",
+    "message": "Portfolio not found",
+    "timestamp": "2026-07-19T12:43:04.8415424",
+    "status": 404
+}
+
+
+# Endpoint Summary
+
+| Method | Endpoint                                | Description                         | Success Status |
+| ------ | --------------------------------------- | ----------------------------------- | -------------- |
+| POST   | `/api/portfolios`                       | Create a new portfolio              | 201 Created    |
+| GET    | `/api/portfolios/{id}`                  | Retrieve one portfolio              | 200 OK         |
+| GET    | `/api/portfolios/investor/{investorId}` | Retrieve portfolios for an investor | 200 OK         |
+| DELETE | `/api/portfolios/{id}`                  | Delete a portfolio                  | 204 No Content |
+
+# Controller Behaviour
+HTTP Request
+      ↓
+PortfolioController
+      ↓
+PortfolioService
+      ↓
+PortfolioRepository
+      ↓
+H2 Database
+
+`

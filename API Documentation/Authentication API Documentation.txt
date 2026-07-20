@@ -1,0 +1,97 @@
+# Authentication API Documentation
+
+## Base Path
+
+/api/auth
+
+For local development, the full base URL is:
+http://localhost:8080/api/auth
+
+## Investor Login
+
+Authenticates an investor using the credentials supplied in the request body.
+
+### Endpoint
+POST /api/auth/login/investor
+
+### Full URL
+http://localhost:8080/api/auth/login/investor
+
+### Request Headers
+Content-Type: application/json
+
+### Request Body
+
+The request body follows the fields defined in LoginRequestDTO.
+
+Example:
+{
+  "username": "5501015009087",
+  "password": "1234"
+}
+
+### Request Fields
+
+| Field      | Type   | Required | Description                        |
+| ---------- | ------ | -------: | ---------------------------------- |
+| username   | String |      Yes | Investor username or email address |
+| password   | String |      Yes | Investor account password          |
+
+The request is validated using:
+@Valid
+
+Validation rules depend on the annotations inside LoginRequestDTO.
+
+### Example Request
+
+curl -X POST http://localhost:8080/api/auth/login/investor \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "5501015009087",
+    "password": "1234"
+  }'
+
+### Successful Response
+{
+    "role": "INVESTOR",
+    "fullName": "Lethabo Mampa",
+    "id": 1,
+    "message": "Login successful",
+    "username": "mampacalvin4@gmail.com"
+}
+
+The endpoint returns a JSON object produced by:
+authService.loginInvestor(dto)
+
+```
+
+The exact response fields depend on the `Map<String, Object>` returned by `AuthService`.
+
+### Invalid Credentials Response
+Example:
+{
+    "path": "/api/auth/login/investor",
+    "error": "Business Rule Violation",
+    "message": "Invalid credentials",
+    "timestamp": "2026-07-18T16:46:21.4703192",
+    "status": 400
+}
+
+
+### Investor Not Found Response
+Example:
+{
+    "path": "/api/auth/login/investor",
+    "error": "Resource Not Found",
+    "message": "Investor not found",
+    "timestamp": "2026-07-18T16:47:31.9838121",
+    "status": 404
+}
+
+
+### Method Behaviour
+
+1. Receives investor login details as JSON.
+2. Validates the request using `LoginRequestDTO`.
+3. Passes the credentials to `AuthService`.
+4. Returns the authentication result with HTTP status `200 OK`.

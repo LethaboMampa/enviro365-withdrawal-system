@@ -1,0 +1,108 @@
+# AI Usage Declaration
+
+## Project
+
+**Enviro365 Withdrawal Management System**
+
+**Developer:** Lethabo Calvin Mampa
+
+# Purpose of AI Usage
+
+Artificial Intelligence (ChatGPT by OpenAI) was used as a learning and productivity tool during the development of this project. AI assisted me with understanding concepts, improving code quality, generating documentation, debugging issues, and explaining best practices. All generated content was reviewed, tested, and modified where necessary before being incorporated into the final solution.
+
+# Areas Where AI Was Used
+
+## 1. Project Planning
+
+AI was used to:
+
+* Understand the project requirements.
+* Plan the backend architecture.
+* Design the folder structure.
+* Recommend best practices for Spring Boot and React.
+
+---
+
+## 2. Backend Development
+
+AI assisted with:
+* Configuring H2 Database.
+* Creating SQL sample data.
+
+The generated code was reviewed and adjusted to meet the assessment requirements.
+
+---
+
+## 4. Frontend Development
+
+AI assisted with:
+
+* React component structure.
+* Axios API integration.
+* Dashboard implementation.
+* Withdrawal request functionality.
+* CSV report download.
+* Debugging frontend errors.
+
+---
+
+## 5. Debugging
+
+AI was used to help diagnose and resolve issues such as:
+
+* Spring Boot configuration errors.
+* Entity relationship problems.
+* H2 database schema issues.
+* React state management.
+* Axios request errors.
+* CSV export functionality.
+* Report filtering logic.
+* Frontend and backend integration issues.
+
+---
+
+## 6. Documentation
+
+AI assisted with preparing project documentation, including:
+
+* Endpoint descriptions.
+* Validation and error responses.
+* README improvements.
+* SQL data documentation.
+* This AI Usage Declaration.
+
+---
+
+# Developer Contribution
+
+Although AI was used throughout the development process, the project was completed through active developer involvement.
+
+Responsibilities performed by the developer included:
+
+* Understanding the project requirements.
+* Making implementation decisions.
+* Writing and modifying code.
+* Integrating frontend and backend components.
+* Testing application functionality.
+* Debugging and resolving issues.
+* Verifying business rules.
+* Reviewing and adapting AI-generated suggestions.
+* Preparing the project for submission.
+
+All final implementation decisions and submitted code remain the responsibility of the developer.
+
+---
+
+# AI Tool Used
+
+* **Tool:** ChatGPT
+* **Provider:** OpenAI
+* **Purpose:** Development assistance, learning support, debugging, documentation, and code review.
+
+---
+
+# Declaration
+
+I confirm that Artificial Intelligence was used as a development support tool to assist with learning, problem solving, code generation, debugging, and documentation. I reviewed, tested, and adapted the generated content before incorporating it into the final solution. The final submitted project reflects my understanding of the implemented functionality and my responsibility for the completed work.
+
+**Developer:** Lethabo Calvin Mampa

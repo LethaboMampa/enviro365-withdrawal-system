@@ -1,0 +1,322 @@
+# Investor API Documentation
+
+## Overview
+
+The Investor API manages investor records in the Enviro365 Withdrawal System.
+
+It supports:
+
+* Creating an investor
+* Retrieving all investors
+* Retrieving a single investor profile
+* Updating investor information
+* Deleting an investor
+
+## Base URL
+http://localhost:8080/api/investors
+
+## Content Type
+
+Requests containing a body must use:
+Content-Type: application/json
+
+
+# 1. Create Investor
+Creates a new investor account.
+
+## Endpoint
+POST /api/investors
+
+## Request Body
+The request body must match `InvestorRequestDTO`.
+
+Example:
+json
+{
+  "fullName": "John Doe",
+  "email": "lethabo.mampa@example.com",
+  "password": "Password123",
+  "phone": "0712345678",
+  "idNumber": "6001015800081",
+  "dateOfBirth": "1960-01-01",
+  "address": "123 Main Street, Pretoria"
+}
+
+## Example Request
+POST http://localhost:8080/api/investors
+Content-Type: application/json
+json
+{
+  "fullName": "John Doe",
+  "email": "lethabo.mampa@example.com",
+  "password": "Password123",
+  "phone": "0712345678",
+  "idNumber": "6001015800081",
+  "dateOfBirth": "1960-01-01",
+  "address": "123 Main Street, Pretoria"
+}
+## Success Response
+
+### Status
+### Example Response
+{
+    "id": 11,
+    "fullName": "John Doe",
+    "email": "lethabo.mampa@example.com",
+    "phone": "0712345678",
+    "idNumber": "6001015800081",
+    "address": "123 Main Street, Pretoria",
+    "dateOfBirth": "1960-01-01",
+    "password": "Password123",
+    "createdAt": "2026-07-19T11:41:26.6633618",
+    "portfolios": []
+}
+
+## Validation Error
+
+Returned when required fields are missing or invalid.
+
+### Status
+
+### Example Response
+{
+  "timestamp": "2026-07-19T15:30:00",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Email is required"
+}
+
+## Possible Errors
+
+* Invalid request data
+* Missing required fields
+* Duplicate email address
+* Duplicate ID number
+
+# 2. Get All Investors
+
+Retrieves all investors registered in the system.
+
+## Endpoint
+GET /api/investors
+
+## Example Request
+GET http://localhost:8080/api/investors
+
+## Success Response
+
+### Status
+200 OK
+
+### Example Response
+  {
+    "id": 1,
+    "fullName": "Thabo Nkosi",
+    "email": "thabo.nkosi@example.com",
+    "phone": "0711111111",
+    "idNumber": "5801015800080",
+    "dateOfBirth": "1958-01-01",
+    "address": "12 Market Street, Johannesburg",
+    "createdAt": "2026-06-01T09:00:00"
+  },
+  {
+    "id": 2,
+    "fullName": "Nomsa Dlamini",
+    "email": "nomsa.dlamini@example.com",
+    "phone": "0722222222",
+    "idNumber": "6205050800082",
+    "dateOfBirth": "1962-05-05",
+    "address": "45 Church Street, Pretoria",
+    "createdAt": "2026-06-02T10:00:00"
+  }
+
+## Important Security Note
+
+This endpoint returns all investors.
+
+In a production system, it should normally be restricted to authenticated administrators because investor information may contain personal data.
+
+---
+
+# 3. Get Investor Profile
+
+Retrieves the profile of a specific investor.
+
+## Endpoint
+GET /api/investors/{id}
+
+## Path Parameter
+
+| Parameter | Type | Required | Description        |
+| --------- | ---- | -------- | ------------------ |
+| `id`      | Long | Yes      | Unique investor ID |
+
+## Example Request
+GET http://localhost:8080/api/investors/1
+
+## Success Response
+
+### Status
+
+```http
+200 OK
+```
+
+### Example Response
+
+The response matches `InvestorProfileDTO`.
+{
+    "address": "25 Nelson Mandela Drive, Pretoria, Gauteng",
+    "dateOfBirth": "1955-01-01",
+    "email": "mampacalvin4@gmail.com",
+    "fullName": "Lethabo Mampa",
+    "id": 1,
+    "idNumber": "5501015009087",
+    "phone": "0821110001"
+}
+
+## Investor Not Found
+
+### Status
+404 Not Found
+
+### Example Response
+{
+    "path": "/api/investors/100",
+    "error": "Resource Not Found",
+    "message": "Investor not found",
+    "timestamp": "2026-07-19T11:31:33.2750732",
+    "status": 404
+}
+
+
+# 4. Update Investor
+
+Updates editable information for an existing investor.
+
+## Endpoint
+PUT /api/investors/{id}
+
+## Path Parameter
+
+| Parameter | Type | Required | Description                  |
+| --------- | ---- | -------- | ---------------------------- |
+| `id`      | Long | Yes      | ID of the investor to update |
+
+## Request Body
+
+The request body must match `InvestorUpdateDTO`.
+
+Example:
+{
+  "fullName": "Lethabo C. Mampa",
+  "phone": "0798765432",
+  "address": "25 Nelson Mandela Drive, Pretoria"
+}
+```
+
+## Example Request
+PUT http://localhost:8080/api/investors/1
+Content-Type: application/json
+
+{
+  "fullName": "Lethabo C. Mampa",
+  "phone": "0798765432",
+  "address": "25 Nelson Mandela Drive, Pretoria"
+}
+
+## Success Response
+200 OK
+
+### Example Response
+{
+    "id": 1,
+    "fullName": "Lethabo C. Mampa",
+    "email": "mampacalvin4@gmail.com",
+    "phone": "0798765432",
+    "idNumber": "5501015009087",
+    "address": "25 Nelson Mandela Drive, Pretoria",
+    "dateOfBirth": "1955-01-01",
+    "password": "1234",
+    "createdAt": "2026-07-19T10:10:21.258525"
+}
+
+## Notes
+
+Based on the frontend implementation, investors can update:
+
+* Full name
+* Phone number
+* Address
+
+The following fields should remains read-only for investors:
+
+* Email
+* ID number
+* Date of birth
+
+# 5. Delete Investor
+
+Deletes an investor from the system.
+
+## Endpoint
+DELETE /api/investors/{id}
+
+## Path Parameter
+
+| Parameter | Type | Required | Description                  |
+| --------- | ---- | -------- | ---------------------------- |
+| `id`      | Long | Yes      | ID of the investor to delete |
+
+## Example Request
+DELETE http://localhost:8080/api/investors/10
+
+## Success Response
+
+### Status
+204 No Content
+
+The response does not contain a body.
+
+## Investor Not Found
+
+### Status
+
+```http
+404 Not Found
+```
+
+### Example Response
+{
+    "path": "/api/investors/500",
+    "error": "Resource Not Found",
+    "message": "Investor not found",
+    "timestamp": "2026-07-19T11:36:17.4737777",
+    "status": 404
+}
+
+# Endpoint Summary
+
+| Method | Endpoint              | Description                  | Success Status |
+| ------ | --------------------- | ---------------------------- | -------------- |
+| POST   | `/api/investors`      | Create an investor           | 201 Created    |
+| GET    | `/api/investors`      | Retrieve all investors       | 200 OK         |
+| GET    | `/api/investors/{id}` | Retrieve an investor profile | 200 OK         |
+| PUT    | `/api/investors/{id}` | Update an investor           | 200 OK         |
+| DELETE | `/api/investors/{id}` | Delete an investor           | 204 No Content |
+
+---
+
+# Controller Behaviour
+
+The controller delegates business logic to `InvestorService`.
+
+HTTP Request
+      ↓
+InvestorController
+      ↓
+InvestorService
+      ↓
+InvestorRepository
+      ↓
+H2 Database

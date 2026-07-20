@@ -1,0 +1,446 @@
+# Withdrawal API Documentation
+
+## Overview
+
+The Withdrawal API manages withdrawal requests, withdrawal history, report generation, and CSV exports in the Enviro365 Withdrawal System.
+
+It supports:
+
+* Submitting a withdrawal request
+* Retrieving withdrawal history for a portfolio
+* Retrieving withdrawal history for an investor
+* Generating a filtered withdrawal report
+* Exporting a filtered withdrawal report as CSV
+
+## Base URL
+http://localhost:8080/api/withdrawals
+
+## Content Type
+
+Requests containing JSON must use:
+Content-Type: application/json
+
+
+# 1. Submit Withdrawal
+Creates a new withdrawal request for a portfolio.
+
+## Endpoint
+POST /api/withdrawals
+
+## Request Body
+
+The request body must match `WithdrawalRequestDTO`.
+
+Example:
+
+{
+  "portfolioId": 1,
+  "amount": 10000.00,
+  "reason": "Monthly living expenses"
+}
+
+
+## Request Fields
+
+| Field         | Type   | Required | Description                                                |
+| ------------- | ------ | -------- | ---------------------------------------------------------- |
+| `portfolioId` | Long   | Yes      | ID of the portfolio from which the money will be withdrawn |
+| `amount`      | Number | Yes      | Requested withdrawal amount                                |
+| `reason`      | String | optional | Reason for the withdrawal                                  |
+
+## Example Request
+POST http://localhost:8080/api/withdrawals
+Content-Type: application/json
+
+{
+  "portfolioId": 1,
+  "amount": 10000.00,
+  "reason": "Monthly living expenses"
+}
+
+## Success Response
+
+### Status
+200 OK
+
+### Example Response
+{
+    "id": 29,
+    "amount": 10000.0,
+    "reason": "Monthly living expenses",
+    "withdrawalDate": "2026-07-20T14:05:21.5783443",
+    "status": "PENDING"
+}
+
+
+## Business Rules
+
+The withdrawal service applies the following rules.
+
+### Retirement Age Rule
+
+For a retirement portfolio, the investor must be older than 65 years.
+
+Possible response:
+400 Bad Request
+
+{
+  "path": "/api/withdrawals",
+  "error": "Business Rule Violation",
+  "message": "Retirement withdrawals only allowed for investors older than 65"
+  "timestamp": "2026-07-19T16:20:00",
+  "status": 400,
+
+  
+}
+
+### Portfolio Balance Rule
+
+The amount cannot exceed the portfolio balance.
+
+{
+    "path": "/api/withdrawals",
+    "error": "Business Rule Violation",
+    "message": "Amount exceeds balance",
+    "timestamp": "2026-07-20T14:08:33.6178094",
+    "status": 400
+}
+
+
+### Ninety-Percent Rule
+
+The amount cannot exceed 90% of the available portfolio balance.
+{
+    "path": "/api/withdrawals",
+    "error": "Business Rule Violation",
+    "message": "Cannot withdraw more than 90% of balance",
+    "timestamp": "2026-07-20T14:12:37.9343983",
+    "status": 400
+}
+
+## Portfolio Not Found
+
+### Status
+404 Not Found
+
+### Example Response
+{
+    "path": "/api/withdrawals",
+    "error": "Resource Not Found",
+    "message": "Portfolio not found",
+    "timestamp": "2026-07-20T14:13:10.8205111",
+    "status": 404
+}
+
+# 2. Get Withdrawal History by Portfolio
+
+Retrieves all withdrawals belonging to a specific portfolio.
+
+## Endpoint
+GET /api/withdrawals/portfolio/{portfolioId}
+
+## Path Parameter
+
+| Parameter     | Type | Required | Description         |
+| ------------- | ---- | -------- | ------------------- |
+| `portfolioId` | Long | Yes      | ID of the portfolio |
+
+## Example Request
+GET http://localhost:8080/api/withdrawals/portfolio/1
+
+## Success Response
+
+### Status
+200 OK
+
+### Example Response
+[
+  {
+    "id": 1,
+    "amount": 1000.0,
+    "reason": "Monthly living expenses",
+    "status": "APPROVED",
+    "withdrawalDate": "2026-06-01T00:00:00"
+  },
+  {
+    "id": 2,
+    "amount": 2500.0,
+    "reason": "Medical expenses",
+    "status": "APPROVED",
+    "withdrawalDate": "2026-06-05T00:00:00"
+  }
+]
+
+## Empty Response
+
+When the portfolio has no withdrawals:
+[]
+
+# 3. Get Withdrawal History by Investor
+Retrieves all withdrawals linked to portfolios belonging to a specific investor.
+
+## Endpoint
+GET /api/withdrawals/investor/{investorId}
+
+## Path Parameter
+
+| Parameter    | Type | Required | Description        |
+| ------------ | ---- | -------- | ------------------ |
+| `investorId` | Long | Yes      | ID of the investor |
+
+## Example Request
+GET http://localhost:8080/api/withdrawals/investor/1
+
+## Success Response
+
+### Status
+200 OK
+
+### Example Response
+[
+  {
+    "id": 1,
+    "amount": 1000.0,
+    "reason": "Monthly living expenses",
+    "status": "APPROVED",
+    "withdrawalDate": "2026-06-01T00:00:00",
+    "portfolio": {
+      "id": 1,
+      "portfolioName": "Primary Retirement Portfolio",
+      "portfolioType": "RETIREMENT"
+    }
+  },
+  {
+    "id": 2,
+    "amount": 2500.0,
+    "reason": "Medical expenses",
+    "status": "APPROVED",
+    "withdrawalDate": "2026-06-05T00:00:00",
+    "portfolio": {
+      "id": 1,
+      "portfolioName": "Primary Retirement Portfolio",
+      "portfolioType": "RETIREMENT"
+    }
+  }
+]
+```
+
+## Empty Response
+
+When the investor has no withdrawals:
+[]
+
+# 4. Generate Withdrawal Report
+
+Generates a filtered withdrawal report for one investor.
+
+The endpoint only returns withdrawals linked to portfolios owned by the specified investor.
+
+## Endpoint
+POST /api/withdrawals/report/{investorId}
+
+## Path Parameter
+
+| Parameter    | Type | Required | Description                                       |
+| ------------ | ---- | -------- | ------------------------------------------------- |
+| `investorId` | Long | Yes      | ID of the investor whose report will be generated |
+
+## Request Body
+
+The request body must match `ReportFilterDTO`.
+
+Example:
+{
+  "fromDate": "2026-07-01",
+  "toDate": "2026-07-31",
+  "status": "PENDING",
+  "amount": 5000,
+  "amountFilterType": "GT"
+}
+
+## Filter Fields
+
+| Field              | Type   | Required | Description                                 |
+| ------------------ | ------ | -------- | ------------------------------------------- |
+| `fromDate`         | Date   | No       | Includes withdrawals on or after this date  |
+| `toDate`           | Date   | No       | Includes withdrawals on or before this date |
+| `status`           | String | No       | Filters by withdrawal status                |
+| `amount`           | Number | No       | Amount used by the comparison filter        |
+| `amountFilterType` | String | No       | Defines how the amount is compared          |
+
+## Supported Status Values
+PENDING
+APPROVED
+REJECTED
+
+## Supported Amount Filter Types
+
+| Value | Meaning                                               |
+| ----- | ----------------------------------------------------- |
+| `GT`  | Withdrawal amount is greater than the supplied amount |
+| `LT`  | Withdrawal amount is less than the supplied amount    |
+| `EQ`  | Withdrawal amount equals the supplied amount          |
+
+## Example Request
+POST http://localhost:8080/api/withdrawals/report/1
+Content-Type: application/json
+
+{
+  "fromDate": "2026-07-01",
+  "toDate": "2026-07-31",
+  "status": "PENDING",
+  "amount": 5000,
+  "amountFilterType": "GT"
+}
+```
+
+## Success Response
+
+### Status
+200 OK
+
+### Example Response
+
+[
+  {
+    "investorId": 1,
+    "investorName": "Thabo Nkosi",
+    "investorEmail": "thabo.nkosi@example.com",
+    "portfolioId": 1,
+    "portfolioName": "Primary Retirement Portfolio",
+    "portfolioType": "RETIREMENT",
+    "portfolioBalance": 175000.0,
+    "withdrawalId": 26,
+    "amount": 10000.0,
+    "reason": "Monthly living expenses",
+    "status": "PENDING",
+    "withdrawalDate": "2026-07-19T16:20:00",
+    "products": "Retirement Annuity Fund (100.0 x 1500.0), Government Bond Fund (50.0 x 700.0)"
+  }
+]
+```
+
+## No Matching Results
+
+When no withdrawals match the filters:
+[]
+
+## Report Without Filters
+
+To retrieve all withdrawals for the specified investor, send null or empty filter values:
+{
+  "fromDate": null,
+  "toDate": null,
+  "status": null,
+  "amount": null,
+  "amountFilterType": null
+}
+```
+
+## Invalid Filter Error
+
+An invalid amount filter type may return:
+400 Bad Request
+
+{
+  "timestamp": "2026-07-19T16:20:00",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Invalid amount filter type. Use GT, LT or EQ"
+}
+
+
+# 5. Export Withdrawal Report as CSV
+
+Generates a filtered withdrawal report for one investor and returns it as a downloadable CSV file.
+
+## Endpoint
+POST /api/withdrawals/export/{investorId}
+
+## Path Parameter
+
+| Parameter    | Type | Required | Description                                          |
+| ------------ | ---- | -------- | ---------------------------------------------------- |
+| `investorId` | Long | Yes      | ID of the investor whose CSV report will be exported |
+
+## Request Body
+
+The request body uses the same `ReportFilterDTO` format as the report endpoint.
+
+Example:
+{
+  "fromDate": "2026-07-01",
+  "toDate": "2026-07-31",
+  "status": "APPROVED",
+  "amount": null,
+  "amountFilterType": null
+}
+
+## Example Request
+POST http://localhost:8080/api/withdrawals/export/1
+Content-Type: application/json
+
+{
+  "fromDate": "2026-07-01",
+  "toDate": "2026-07-31",
+  "status": "APPROVED",
+  "amount": null,
+  "amountFilterType": null
+}
+
+## Success Response
+
+### Status
+200 OK
+
+### Response Headers
+Content-Type: text/csv;charset=UTF-8
+Content-Disposition: attachment; filename=withdrawal_report.csv
+
+## CSV Columns
+
+The downloaded file contains these columns:
+Investor ID
+Investor Name
+Email
+Portfolio ID
+Portfolio Name
+Portfolio Type
+Balance
+Products
+Withdrawal ID
+Amount
+Reason
+Status
+Date
+
+## Example CSV Content
+"Investor ID","Investor Name","Email","Portfolio ID","Portfolio Name","Portfolio Type","Balance","Products","Withdrawal ID","Amount","Reason","Status","Date"
+"1","Thabo Nkosi","thabo.nkosi@example.com","1","Primary Retirement Portfolio","RETIREMENT","175000.0","Retirement Annuity Fund (100.0 x 1500.0)","1","1000.0","Monthly living expenses","APPROVED","2026-06-01T00:00"
+
+
+# Endpoint Summary
+
+| Method | Endpoint                                   | Description                      | Success Status |
+| ------ | ------------------------------------------ | -------------------------------- | -------------- |
+| POST   | `/api/withdrawals`                         | Submit a withdrawal request      | 200 OK         |
+| GET    | `/api/withdrawals/portfolio/{portfolioId}` | Get portfolio withdrawal history | 200 OK         |
+| GET    | `/api/withdrawals/investor/{investorId}`   | Get investor withdrawal history  | 200 OK         |
+| POST   | `/api/withdrawals/report/{investorId}`     | Generate a filtered report       | 200 OK         |
+| POST   | `/api/withdrawals/export/{investorId}`     | Export a filtered CSV report     | 200 OK         |
+
+---
+
+# Controller Behaviour
+
+HTTP Request
+      ↓
+WithdrawalController
+      ↓
+WithdrawalService
+      ↓
+PortfolioRepository and WithdrawalRepository
+      ↓
+H2 Database
+
+
