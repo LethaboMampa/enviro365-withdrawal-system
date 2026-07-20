@@ -344,7 +344,7 @@ Artificial Intelligence (ChatGPT by OpenAI) was used as a development support to
 
 All generated content was reviewed, tested, and adapted before inclusion in the final project.
 
-For more information, see **AI Usage Declaration.txt**.
+For more information, see **README.md**.
 
 ---
 
