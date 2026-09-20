@@ -2,8 +2,6 @@
 
 ## Overview
 
-The **Enviro365 Withdrawal Management System** is a full-stack web application developed as part of the **Enviro365 Junior Java Developer Assessment**.
-
 The application enables investors to securely manage their investment portfolios, submit withdrawal requests, view withdrawal history, update profile information, and generate downloadable withdrawal reports.
 
 The system consists of a **Spring Boot REST API** backend and a **React.js** frontend communicating through RESTful web services.
@@ -352,15 +350,13 @@ For more information, see **README.md**.
 
 **Lethabo Calvin Mampa**
 
-Computer Science Student
+Computer Science
 
 Tshwane University of Technology
 
 ---
 
-# Assessment
-
-This project was developed as part of the **Enviro365 Junior Java Developer Assessment** and demonstrates knowledge of:
+# Skills Of
 
 * Java
 * Spring Boot
@@ -375,8 +371,3 @@ This project was developed as part of the **Enviro365 Junior Java Developer Asse
 
 ---
 
-# Thank You
-
-Thank you for taking the time to review this submission.
-
-I appreciate the opportunity to complete this assessment and demonstrate my technical skills and passion for software development. I hope this project reflects my ability to build clean, maintainable, and user-focused applications while following modern Java and React development practices.
